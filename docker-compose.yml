@@ -1,0 +1,9 @@
+version: "3.9"
+
+services:
+  api:
+    build:
+      context: /home/pablo/Undav/PD2/gestion-usuarios
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"

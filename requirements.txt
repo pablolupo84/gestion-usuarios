@@ -1,0 +1,9 @@
+fastapi[all]
+#sqlalchemy[mypy]
+#SQLAlchemy-Utils
+#mypy
+#flake8
+#black
+#alembic
+#pytest
+#python-dotenv
