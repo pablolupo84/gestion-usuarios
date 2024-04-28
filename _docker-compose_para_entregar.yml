@@ -3,9 +3,7 @@ version: "3.12"
 services:
   api:
     build:
-      context: .
+      context: /home/pablo/Undav/PD2/gestion-usuarios
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
-    volumes:
-      - .:/app

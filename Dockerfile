@@ -1,9 +1,10 @@
-#Buscando una imagen que contenga Python y FastAPI me encontre con esto
-
+#Utilizo una imagen base de Python 3.12
 FROM python:3.12-slim
-LABEL Description = "Imagen de gestion-usuarios"
+LABEL description = "Imagen de gestion-usuarios"
 
+#Asigno como directorio de trabajo /app
 WORKDIR /app
+
 COPY ./ ./
 
 RUN pip install --no-cache-dir -r requirements.txt
