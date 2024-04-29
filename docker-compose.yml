@@ -1,11 +1,11 @@
-version: "3.12"
+#version: "3.8" -> warning de obsoleto
 
 services:
-  api:
+  usuarios:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: usuarios/Dockerfile
     ports:
       - "8000:8000"
-    volumes:
-      - .:/app
+#    volumes:
+#      - ./usuarios:/app/usuarios
