@@ -34,15 +34,25 @@ listado_usuarios = [
 async def root():
     return {"message" : "Esta es la app para Gestion de Usuarios - Pablo Lupo"}
 
+#Funcion Auxiliar - Verificacion de usuario en mi listado de usuarios
+def usuario_no_existe(nombre:str):
+    for usuario in listado_usuarios:
+        if usuario.nombre == nombre:
+            return False
+    return True
+    
 #Crear nuevo Usuario
 @app.post("/usuarios/",response_model=Usuario,status_code=status.HTTP_201_CREATED)
 def crear_usuario(nuevo_usuario: Usuario):
-    #Lo creo autoincremental
-    nuevo_usuario.identificador=len(listado_usuarios)+1
-    nuevo_usuario.fecha_creacion=datetime.now()
-    nuevo_usuario.fecha_eliminacion= None
-    listado_usuarios.append(nuevo_usuario)
-    return nuevo_usuario
+    #Lo creo autoincremental si no existe por nombre de usuario
+    if (usuario_no_existe(nuevo_usuario.nombre)):
+        nuevo_usuario.identificador=len(listado_usuarios)+1
+        nuevo_usuario.fecha_creacion=datetime.now()
+        nuevo_usuario.fecha_eliminacion= None
+        listado_usuarios.append(nuevo_usuario)
+        return nuevo_usuario
+    else:
+        raise HTTPException(status_code=404, detail="Usuario Exitente")    
 
 #Borrar Usuario sin eliminacion fisica - Queda marcado por la fecha de eliminacion
 @app.delete("/usuarios/{identificador}/")
@@ -57,7 +67,6 @@ def borrar_usuario(identificador: int):
                 return {"message": "Usuario eliminado exitosamente"}
                 break
     raise HTTPException(status_code=404, detail="No se encontró el usuario")
-
 
 #Obtener un Usuario
 @app.get("/usuarios/{identificador}",response_model=Usuario)

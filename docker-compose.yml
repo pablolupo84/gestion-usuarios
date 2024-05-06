@@ -1,11 +1,21 @@
 #version: "3.8" -> warning de obsoleto
 
 services:
-  usuarios:
+  api:
     build:
       context: .
       dockerfile: usuarios/Dockerfile
     ports:
       - "8000:8000"
-#    volumes:
-#      - ./usuarios:/app/usuarios
+    #volumes:
+    #  - ./usuarios:/app/usuarios
+  autenticacion:
+    build:
+      context: .
+      dockerfile: autenticacion/Dockerfile
+    ports:
+      - "8001:8001"
+    env_file:
+      - autenticacion/.env
+    #volumes:
+    #  - ./autenticacion:/app/autenticacion
