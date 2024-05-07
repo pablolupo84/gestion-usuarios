@@ -1,4 +1,4 @@
-from fastapi import FastAPI,HTTPException,Depends
+from fastapi import FastAPI,HTTPException,Depends,Header
 from login import Login
 from datetime import timedelta,datetime
 from jose import jwt
@@ -72,32 +72,25 @@ def obtener_usuario_desde_token(token:str):
         return decodificacion.get("sub") #{'sub': 'pepeLuis', 'exp': 1714856803}
     except jwt.JWTError:
         return None
-
-#Funcion Auxiliar para saber si un usuario esta autenticado con un token
-def esta_autenticado(token:str=Depends(obtener_usuario_desde_token)):
-    if token:
-        return True
-    else:
-        raise HTTPException(status_code=401, detail="Usuario no autenticasdo")        
-
-#Endpoint para una ruta protegida
-@app.get("/probar-token")
-def ruta_solo_para_autenticados(usuario_autenticado: bool = Depends(esta_autenticado)):
-    return{"mensaje":"Esta ruta es solo para usuarios autenticados, esta protegida"}
-
-#Endpoint para verificar token
-@app.get("/verificar_token")
+    
+#Funcion Auxiliar para VERIFICAR Y VALIDAR Un token
 def verificar_token(token:str):
     if es_token_valido(token):
         if esta_expirado_token(token):
             raise HTTPException(status_code=401, detail="Token expirado")
         else:
-            return{"message":"Token valido"}
+            return obtener_usuario_desde_token(token)
     else:
         raise HTTPException(status_code=401, detail="Token invalido")
+
+#Endpoint para una ruta protegida
+@app.get("/obtener_usuario_actual")
+def ruta_solo_para_autenticados(usuario_autenticado: str = Depends(verificar_token)):
+    return{"mensaje":"Esta ruta es solo para usuarios autenticados: " + usuario_autenticado}
 
 #Endpoint para Logout de un usuario
 @app.post("/logout")
 def login(datos:Login):
     #Decidi dejarlo que por su naturaleza se invalide el token por el tiempo de expiracion configurado
     return{"message":"Logout"}
+
