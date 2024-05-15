@@ -4,7 +4,7 @@ services:
   api:
     build:
       context: .
-      dockerfile: usuarios/Dockerfile
+      dockerfile: ./usuarios/Dockerfile
     ports:
       - "8000:8000"
     #volumes:
@@ -12,10 +12,10 @@ services:
   autenticacion:
     build:
       context: .
-      dockerfile: autenticacion/Dockerfile
+      dockerfile: ./autenticacion/Dockerfile
     ports:
       - "8001:8001"
     env_file:
-      - autenticacion/.env
+      - ./autenticacion/.env
     #volumes:
     # - ./autenticacion:/app/autenticacion
