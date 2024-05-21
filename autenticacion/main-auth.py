@@ -35,84 +35,108 @@ listado_usuarios = [
 
 #Funcion Auxiliar - Verificacion de usuario en mi listado de usuarios
 def verificar_usuario(nombre:str,contraseña:str):
+    logger.info("Ingreso a Funcion Auxiliar verificar_usuario")
     for data in listado_usuarios:
         if nombre==data.nombre and contraseña==data.contraseña:
+            logger.info(f"Usuario verificado {nombre}")
             return data
+    logger.info("Usuario no verificado o inexistente")
     return None          
 
-#Funcion Auxiliar - CReacion de access tocke con tiempo por defecto de 10 minutos
+#Funcion Auxiliar - CReacion de access token
 def crear_access_token(datos:dict,expires_delta:timedelta=None):
+    logger.info("Ingreso a Funcion Auxiliar crear_access_token")
     datos_copiar=datos.copy()
+    logger.info("Asignacion de tiempo de expiracion")
     if expires_delta:
         expire=datetime.now()+expires_delta
     else:
         expire=datetime.now()+ timedelta(minutes=var_access_token)
     datos_copiar.update({"exp":expire})
+    logger.info(f"Asignacion y Actualizacion de tiempo de expiracion = {expire}")
     token=jwt.encode(datos_copiar,key=var_secret_key,algorithm=var_algorithm)
+    logger.info(f"Token: = {token}")
     return token
 
 #Endpoint para Login de un usuario
 @app.post("/login")
 def login(datos:Login):
+    logger.info("Ingreso a endpoint login")
     datos_usuario=verificar_usuario(datos.nombre,datos.contraseña)
     if datos_usuario:
         access_token_expires = timedelta (minutes=var_access_token)
         access_token_jwt=crear_access_token({"sub": datos_usuario.nombre},access_token_expires)
         return {"access_token" : access_token_jwt,
-                "token_type":"bearer"}       
-    raise HTTPException(status_code=401, detail="Credenciales Invaldia")
+                "token_type":"bearer"}
+    else:
+        logger.warning("Credenciales invalidas para realziar el login")
+        raise HTTPException(status_code=401, detail="Credenciales Invaldia")
 
 #Endpoint para Logout de un usuario
 @app.post("/logout")
-def login(datos:Login):
-    #Decidi dejarlo que por su naturaleza se invalide el token por el tiempo de expiracion configurado
-    return{"message":"Logout"}
+def logout(datos:Login):
+    #Tiene configurado el deslogueo automatico
+    logger.info("Ingreso a endpoint logout - Automatico luego de x minutos configurados")
+    return{"message":"Logout Automatico"}
 
 #Funcion Auxiliar para saber si un token es valido
 def es_token_valido(token:str):
+    logger.info("Ingreso a Funcion Auxiliar es_token_valido")
     try:
         decodificacion=jwt.decode(token,var_secret_key,algorithms=[var_algorithm])
+        logger.info(f"Token valido {decodificacion}")
         return decodificacion #{'sub': 'pepeLuis', 'exp': 1714856803}
     except jwt.JWTError:
+        logger.warning(f"Token Invalido: {jwt.JWTError}")
         return None
 
 #Funcion Auxiliar para saber si un token esta expirado
 def esta_expirado_token(token:str):
-    decodificacion=jwt.decode(token,var_secret_key,algorithms=[var_algorithm])
-    tiempo_expiracion=datetime.fromtimestamp(decodificacion['exp'])
-    return datetime.now()>=tiempo_expiracion
+    logger.info("Ingreso a Funcion Auxiliar esta_expirado_token")
+    try:
+        decodificacion=jwt.decode(token,var_secret_key,algorithms=[var_algorithm])
+        logger.info(f"Decodificacion: {decodificacion}")
+        tiempo_expiracion=datetime.fromtimestamp(decodificacion['exp'])
+        logger.info(f"Tiempo de Expiracion: {tiempo_expiracion}")
+        logger.info(f"Esta expirado: {datetime.now()>=tiempo_expiracion}")
+        return datetime.now()>=tiempo_expiracion
+    except jwt.JWTError:
+        logger.warning(f"Error decodificando: {jwt.JWTError}")
+        return True
+
 
 #Funcion Auxiliar para obtener un nombre de usuario a partir de un token
 def obtener_nombre_usuario_desde_token(token:str):
+    logger.info("Ingreso a Funcion Auxiliar obtener_nombre_usuario_desde_token")
     try:
         decodificacion=jwt.decode(token,var_secret_key,algorithms=[var_algorithm])
+        logger.info(f"Usuario: {decodificacion.get("sub")}")
         return decodificacion.get("sub") #{'sub': 'pepeLuis', 'exp': 1714856803}
     except jwt.JWTError:
+        logger.info(f"Usuario no encontrado: {jwt.JWTError}")
         return None
 
 #Funcion Auxiliar para obtener un usuario a partir de un token
 def obtener_usuario_desde_token(token:str):
+    logger.info("Ingreso a Funcion Auxiliar obtener_usuario_desde_token")
     try:
         decodificacion=jwt.decode(token,var_secret_key,algorithms=[var_algorithm])
+        logger.info(f"Usuario: {decodificacion}")
         return decodificacion #{'sub': 'pepeLuis', 'exp': 1714856803}
     except jwt.JWTError:
+        logger.info(f"Usuario no encontrado: {jwt.JWTError}")
         return None
 
 #Endpoint para verificar un token
 @app.get("/verificar_token")
 def verificar_token(token:str):
-    if es_token_valido(token):
+    logger.info("Ingreso a endpoint verificar_token")
+    decodificacion=es_token_valido(token)
+    if decodificacion:
         if esta_expirado_token(token):
             raise HTTPException(status_code=401, detail="Token expirado")
         else:
             return obtener_usuario_desde_token(token)
     else:
-        raise HTTPException(status_code=401, detail="Token invalido")
-
-"""
-#Endpoint para una ruta protegida
-@app.get("/obtener_usuario_actual")
-def ruta_solo_para_autenticados(usuario_autenticado: str = Depends(verificar_token)):
-    return{"mensaje":"Esta ruta es solo para usuarios autenticados: " + usuario_autenticado}
-
-"""
+        logger.warning("Decodificacion None - Token INvalido")
+        raise HTTPException(status_code=401, detail="Token invalido")    

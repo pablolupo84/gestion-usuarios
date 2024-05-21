@@ -52,9 +52,12 @@ async def root():
 
 #Funcion Auxiliar - Verificacion de usuario en mi listado de usuarios
 def usuario_no_existe(nombre:str):
+    logger.info("Funcion Auxiliar - usuario_no_existe")
     for usuario in listado_usuarios:
         if usuario.nombre == nombre:
+            logger.info(f"Usuario encontrado = {nombre}")
             return False
+    logger.info(f"Usuario NO encontrado = {nombre}")
     return True
 
 # Middleware de Autenticación
@@ -79,11 +82,11 @@ async def auth_middleware(request: Request, call_next):
 
     try:
         response = requests.get(f"{aut_url}verificar_token", params={"token": token})
-        logger.info(f"Middleware de Autenticacion - response {response.status_code}")
-
         if response.status_code != 200:
-            raise HTTPException(status_code=401, detail="Token inválido")
+            logger.error(f"Response !=200 : {response.status_code}")
+            raise HTTPException(status_code=response.status_code, detail="Token inválido")
     except requests.exceptions.RequestException as e:
+        logger.error(f"Middleware de Autenticacion - Error de conexion: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
     
     response = await call_next(request)
@@ -113,24 +116,31 @@ def borrar_usuario(identificador: int):
     for usuario in listado_usuarios:
         if usuario.identificador == identificador:
             if usuario.fecha_eliminacion is not None:
+                logger.info(f"Usuario {identificador} ya se encuentra eliminado")
                 return {"message": "El usuario ya se encuentra eliminado."}
             else:
                 #elimino y devuelvo mensaje
                 usuario.fecha_eliminacion = datetime.now()
+                logger.info(f"Usuario {identificador} eliminado exitosamente")
                 return {"message": "Usuario eliminado exitosamente"}
                 break
+    logger.info(f"NO se encuentra el Usuario {identificador}")        
     raise HTTPException(status_code=404, detail="No se encontró el usuario")
 
 #Obtener un Usuario
 @app.get("/usuarios/{identificador}",response_model=Usuario)
 def obtener_usuario(identificador: int):
+    logger.info("Endpoint obtener_usuario")
     for usuario in listado_usuarios:
         if usuario.identificador==identificador and not usuario.fecha_eliminacion:
+            logger.info(f"Usuario {identificador} encontrado")
             return usuario
+    logger.info(f"NO se encuentra el Usuario {identificador}")    
     raise HTTPException(status_code=404,detail="No se encontro el usuario")
 
 #Obtener todos los Usuarios
 @app.get("/usuarios",response_model=List[Usuario])
 def obtener_todos_los_usuarios():
+    logger.info("Endpoint obtener_todos_los_usuarios")
     return [usuario for usuario in listado_usuarios if not usuario.fecha_eliminacion]
 
