@@ -10,6 +10,8 @@ COPY ./usuarios /app/usuarios/
 
 RUN pip install --no-cache-dir -r /app/usuarios/requirements.txt
 
+RUN mkdir -p /app/logs
+
 EXPOSE 8000
 
-CMD ["uvicorn", "main:app", "--reload" ,"--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "main-user:app", "--reload" ,"--host", "0.0.0.0", "--port", "8000"]

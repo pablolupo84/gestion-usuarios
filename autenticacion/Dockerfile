@@ -10,6 +10,8 @@ COPY ./autenticacion /app/autenticacion/
 
 RUN pip install --no-cache-dir -r /app/autenticacion/requirements.txt
 
-EXPOSE 8001
+RUN mkdir -p /app/logs
 
-CMD ["uvicorn", "main:app", "--reload" ,"--host", "0.0.0.0", "--port", "8001"]
+EXPOSE 8000
+
+CMD ["uvicorn", "main-auth:app", "--reload" ,"--host", "0.0.0.0", "--port", "8000"]

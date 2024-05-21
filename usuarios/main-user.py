@@ -1,11 +1,26 @@
-from fastapi import FastAPI, Response,HTTPException,status
+from fastapi import FastAPI, Request,HTTPException,status
 from datetime import datetime
 from usuario import Usuario
 from typing import List
+import os,requests,logging
+
+# Configuración de logging
+log_file=os.path.join('/app/logs','app.log')
+
+logging.basicConfig(level=logging.INFO, 
+                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                    handlers=[logging.FileHandler(log_file),
+                    logging.StreamHandler()]
+                    )
+
+logger = logging.getLogger(__name__)
+
+#Variables de entorno
+aut_url = os.environ.get("AUTENTICACION_URL")
 
 app=FastAPI()
 
-#Inicialmente se salva en una lista, luego pienso pasarlo a base de datos.
+#Usuarios en Memoria
 listado_usuarios = [
     Usuario(
         identificador=1,
@@ -32,6 +47,7 @@ listado_usuarios = [
 
 @app.get("/")
 async def root():
+    logger.info("Endpoint Acceso a la ruta raíz")
     return {"message" : "Esta es la app para Gestion de Usuarios - Pablo Lupo"}
 
 #Funcion Auxiliar - Verificacion de usuario en mi listado de usuarios
@@ -40,23 +56,60 @@ def usuario_no_existe(nombre:str):
         if usuario.nombre == nombre:
             return False
     return True
+
+# Middleware de Autenticación
+# Todas las solicitudes deben estar autenticadas verificando el token JWT
+# SE ejecuta antes de cada solicitud para cualqueir endoint del servicio.
+
+@app.middleware("http")
+async def auth_middleware(request: Request, call_next):
+    logger.info("Inicio de Middleware de Autenticacion")
+    token = request.headers.get("Authorization")
     
+    if not token or token.strip() == "":
+        logger.info(f"Middleware de Autenticacion - Falta el Token de autorizacion")
+        raise HTTPException(status_code=401, detail="Falta el token de autorización")
+
+    token = token.replace("Bearer ", "").strip()
+    logger.info(f"Middleware de Autenticacion - Token: {token}")
+
+    if not token:
+        logger.info(f"Middleware de Autenticacion - Token VACIO")
+        raise HTTPException(status_code=401, detail="Token de autorización vacío")
+
+    try:
+        response = requests.get(f"{aut_url}verificar_token", params={"token": token})
+        logger.info(f"Middleware de Autenticacion - response {response.status_code}")
+
+        if response.status_code != 200:
+            raise HTTPException(status_code=401, detail="Token inválido")
+    except requests.exceptions.RequestException as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+    response = await call_next(request)
+    return response
+    
+
 #Crear nuevo Usuario
 @app.post("/usuarios/",response_model=Usuario,status_code=status.HTTP_201_CREATED)
 def crear_usuario(nuevo_usuario: Usuario):
     #Lo creo autoincremental si no existe por nombre de usuario
+    logger.info("Endpoint POST de nuevo usuario")
     if (usuario_no_existe(nuevo_usuario.nombre)):
+        logger.info(f"Se crea el usuario {nuevo_usuario.nombre}")
         nuevo_usuario.identificador=len(listado_usuarios)+1
         nuevo_usuario.fecha_creacion=datetime.now()
         nuevo_usuario.fecha_eliminacion= None
         listado_usuarios.append(nuevo_usuario)
         return nuevo_usuario
     else:
+        logger.info(f"Usuario {nuevo_usuario.nombre} Existente")
         raise HTTPException(status_code=404, detail="Usuario Exitente")    
 
 #Borrar Usuario sin eliminacion fisica - Queda marcado por la fecha de eliminacion
 @app.delete("/usuarios/{identificador}/")
 def borrar_usuario(identificador: int):
+    logger.info("Endpoint DELETTE de usuario")
     for usuario in listado_usuarios:
         if usuario.identificador == identificador:
             if usuario.fecha_eliminacion is not None:
@@ -77,6 +130,7 @@ def obtener_usuario(identificador: int):
     raise HTTPException(status_code=404,detail="No se encontro el usuario")
 
 #Obtener todos los Usuarios
-@app.get("/usuarios/",response_model=List[Usuario])
+@app.get("/usuarios",response_model=List[Usuario])
 def obtener_todos_los_usuarios():
     return [usuario for usuario in listado_usuarios if not usuario.fecha_eliminacion]
+

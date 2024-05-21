@@ -1,21 +1,28 @@
 #version: "3.8" -> warning de obsoleto
 
 services:
-  api:
-    build:
-      context: .
-      dockerfile: ./usuarios/Dockerfile
-    ports:
-      - "8000:8000"
-    #volumes:
-    #  - ./usuarios:/app/usuarios
-  autenticacion:
+  servicio_autenticacion:
     build:
       context: .
       dockerfile: ./autenticacion/Dockerfile
     ports:
-      - "8001:8001"
+      - "8000:8000"
     env_file:
       - ./autenticacion/.env
-    #volumes:
-    # - ./autenticacion:/app/autenticacion
+    volumes:
+     - ./autenticacion:/app/autenticacion
+     - ./logs:/app/logs
+  servicio_usuario:
+    build:
+      context: .
+      dockerfile: ./usuarios/Dockerfile
+    ports:
+      - "8001:8000"
+    env_file:
+      - ./usuarios/.env
+    depends_on:
+      - servicio_autenticacion
+    volumes:
+      - ./usuarios:/app/usuarios
+      - ./logs:/app/logs
+  
