@@ -9,8 +9,9 @@ log_file=os.path.join('/app/logs','app.log')
 
 logging.basicConfig(level=logging.INFO, 
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    handlers=[logging.FileHandler(log_file),
-                    logging.StreamHandler()]
+                    handlers=logging.FileHandler(log_file)
+                    #handlers=[logging.FileHandler(log_file),
+                    #logging.StreamHandler()]
                     )
 
 logger = logging.getLogger(__name__)

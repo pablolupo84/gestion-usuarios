@@ -1,0 +1,294 @@
+{
+	"info": {
+		"_postman_id": "2d7bcdf0-ce8b-41a2-a896-3606cf78fe82",
+		"name": "TP-Usuarios",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "23474992",
+		"_collection_link": "https://interstellar-robot-259714.postman.co/workspace/My-Workspace~c7fbe115-e350-4bf4-8942-45067b0f2b98/collection/23474992-2d7bcdf0-ce8b-41a2-a896-3606cf78fe82?action=share&source=collection_link&creator=23474992"
+	},
+	"item": [
+		{
+			"name": "obtener_raiz",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"nombre\":\"pepeLuis\",\n    \"contraseña\":\"12345\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8000/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "login_usuario_existente",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"nombre\":\"pepeLuis\",\n    \"contraseña\":\"12345\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8000/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "login_usuario_con_credenciales_falsas",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"nombre\":\"pepeLuis\",\n    \"contraseña\":\"123456789\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8000/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "login_usuario_inexistente",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"nombre\":\"MarcoAurelio\",\n    \"contraseña\":\"123456789\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8000/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "verificar_token",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8000/verificar_token?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJwZXBlTHVpcyIsImV4cCI6MTcxNjE1NTU4Mn0.In3QT3OCpU93PeqgrjnG7bMOo-gzocv8EDpPY7TwicA",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"verificar_token"
+					],
+					"query": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJwZXBlTHVpcyIsImV4cCI6MTcxNjE1NTU4Mn0.In3QT3OCpU93PeqgrjnG7bMOo-gzocv8EDpPY7TwicA"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "obtener_raiz_con_autorizacion",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJwZXBlTHVpcyIsImV4cCI6MTcxNjE1Nzg0Mn0.qBfIKc0msn4PjqeaUMp99sLQ1AC4wbLARv8mXatrxJ0",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8001/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8001",
+					"path": [
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "obtener_todos_los_usuarios",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJwZXBlTHVpcyIsImV4cCI6MTcxNjE1Nzg0Mn0.qBfIKc0msn4PjqeaUMp99sLQ1AC4wbLARv8mXatrxJ0",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8001/usuarios",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8001",
+					"path": [
+						"usuarios"
+					],
+					"query": [
+						{
+							"key": "",
+							"value": null,
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "obtener_usuario",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJwZXBlTHVpcyIsImV4cCI6MTcxNjE1Nzg0Mn0.qBfIKc0msn4PjqeaUMp99sLQ1AC4wbLARv8mXatrxJ0",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8001/usuarios/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8001",
+					"path": [
+						"usuarios",
+						"1"
+					],
+					"query": [
+						{
+							"key": "",
+							"value": null,
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "borrar_usuario",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJwZXBlTHVpcyIsImV4cCI6MTcxNjE1Nzg0Mn0.qBfIKc0msn4PjqeaUMp99sLQ1AC4wbLARv8mXatrxJ0",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8001/usuarios/1/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8001",
+					"path": [
+						"usuarios",
+						"1",
+						""
+					],
+					"query": [
+						{
+							"key": "",
+							"value": null,
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

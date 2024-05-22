@@ -2,9 +2,12 @@
 
 Trabajo Practico Inicial - Gestion de Usuarios con FAST API PABLO LUPO
 
-2 carpetas con sus codigos fuentes
+3 carpetas con sus codigos fuentes
 #autenticacion
 #usuarios
+#tests
+
+1 carpeta de logs
 
 Para correr la app se necesita realizar lo siguiente:
 
@@ -21,13 +24,9 @@ http://localhost:8000/
 #autenticacion
 http://localhost:8001/
 
-Para Realizar las Pruebas en Postman:
+Se generan pruebas automatizadas con pytest para las autenticaciones.
 
-GET usuarios_1: obtiene el usuairo con id=1.
-POST crear_usuario: Crea un nuevo usuario.
-POST login_pepe: Crea un token para el usuario si no existe (Copiar el Token para utilziar luego).
-POST login_pepe_false: No puede crear por que ya existe el usuario.
-DEL delete_usuario_1: ELimina el usuario conID=1.
-DEL delete_usuario_100_false: No puede eliminar por que no existe el usuario con ID=100.
-GET obtener_usuario: OBtiene todos los usuarios no eliminados.
-GET info_usuario_actual: Agregando el token copiado anteriormente, valida que existe y luego entrega la informaciond e dicho usuario.
+Para Realizar las Pruebas en Postman, hay una coleccion en:
+test/TP-Usuarios.postman_collection.json
+
+Para todas las pruebas en que se necesita realizar una verificacion, hay que insertar un token valido.
