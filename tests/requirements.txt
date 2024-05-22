@@ -1,0 +1,6 @@
+fastapi[all]
+pydantic
+python-jose[cryptography]
+pytest
+requests
+httpx

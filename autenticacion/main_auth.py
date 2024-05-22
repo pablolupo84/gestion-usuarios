@@ -16,7 +16,7 @@ logging.basicConfig(level=logging.INFO,
 logger = logging.getLogger(__name__)
 
 #Variables de entorno
-var_access_token = int(os.environ.get("ACCESS_TOKEN_EXPIRACION_MIN"))
+var_access_token = os.environ.get("ACCESS_TOKEN_EXPIRACION_MIN")
 var_secret_key = os.environ.get("SECRET_KEY")
 var_algorithm = os.environ.get("ALGORITHM")
 
@@ -51,7 +51,7 @@ def crear_access_token(datos:dict,expires_delta:timedelta=None):
     if expires_delta:
         expire=datetime.now()+expires_delta
     else:
-        expire=datetime.now()+ timedelta(minutes=var_access_token)
+        expire=datetime.now()+ timedelta(minutes=int(var_access_token))
     datos_copiar.update({"exp":expire})
     logger.info(f"Asignacion y Actualizacion de tiempo de expiracion = {expire}")
     token=jwt.encode(datos_copiar,key=var_secret_key,algorithm=var_algorithm)
@@ -64,7 +64,7 @@ def login(datos:Login):
     logger.info("Ingreso a endpoint login")
     datos_usuario=verificar_usuario(datos.nombre,datos.contraseña)
     if datos_usuario:
-        access_token_expires = timedelta (minutes=var_access_token)
+        access_token_expires = timedelta (minutes=int(var_access_token))
         access_token_jwt=crear_access_token({"sub": datos_usuario.nombre},access_token_expires)
         return {"access_token" : access_token_jwt,
                 "token_type":"bearer"}
